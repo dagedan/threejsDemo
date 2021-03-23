@@ -10,7 +10,15 @@ module.exports = merge(common, {
   devServer: {
     port: 3000,
     compress: true,
-    hot: true
+    hot: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /.(less|css)$/i,
+        use: ["style-loader", "css-loader", "less-loader"],
+      },
+    ],
   },
   plugins: [
     new webpack.DefinePlugin({
