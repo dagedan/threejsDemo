@@ -1,34 +1,43 @@
 import * as THREE from 'three';
+import Stats from 'stats.js'
 import '../style.css'
-let camera, scene, renderer;
-let geometry, material, mesh;
+import scene from './scene'
+import camera from './camera'
+import renderer from './renderer'
+import directionalLight from './light'
 
-init();
+import mesh from '../obj/boxMesh'
+import lineMesh from '../obj/lineMesh'
+import faceMesh from '../obj/faceMesh'
+import GUICameraProperty, { GUILightProperty } from './gui'
 
-function init() {
+var stats = new Stats();
+stats.showPanel( 0 )
+document.body.appendChild( stats.dom );
 
-	camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-	camera.position.z = 1;
+scene.add( mesh );
+scene.add( lineMesh );
+// scene.add( faceMesh );
+directionalLight.position.set(-10, 10 , 1)
+scene.add( directionalLight );
 
-	scene = new THREE.Scene();
+// const obj = new THREE.Object3D()
+const helperLight = new THREE.DirectionalLightHelper( directionalLight, 10 );
+scene.add( helperLight );
 
-	geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
-	material = new THREE.MeshNormalMaterial();
+const helper = new THREE.CameraHelper( camera );
+scene.add( helper );
+const axesHelper = new THREE.AxesHelper( 60 );
+scene.add( axesHelper );
 
-	mesh = new THREE.Mesh( geometry, material );
-	scene.add( mesh );
+renderer.setAnimationLoop( time => {
+  stats.begin();
+  GUICameraProperty(camera)
+  GUILightProperty(directionalLight)
+  mesh.rotation.x = time / 200;
+  mesh.rotation.y = time / 1000;
+  stats.end();
+  renderer.render( scene, camera );
+})
+document.body.appendChild( renderer.domElement )
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setAnimationLoop( animation );
-	document.body.appendChild( renderer.domElement );
-}
-
-function animation( time ) {
-
-	mesh.rotation.x = time / 2000;
-	mesh.rotation.y = time / 1000;
-
-	renderer.render( scene, camera );
-
-}
